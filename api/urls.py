@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from users.views import RegisterView, VerifyEmailView, LoginView, BuyerDashboard, SellerDashboard, UserViewSet
-from services.views import ServiceViewSet, CategoryViewSet  
+from services.views import ServiceViewSet, CategoryViewSet, ServiceImageViewSet
 from orders.views import OrderViewSet
 from notifications.views import NotificationViewSet
 from dashboard.views import AdminDashboardView
@@ -14,6 +14,7 @@ router.register('categories', CategoryViewSet, basename='category')
 router.register('orders', OrderViewSet)
 router.register('notifications', NotificationViewSet)
 router.register('reviews', ReviewViewSet)
+router.register('images', ServiceImageViewSet, basename='image')
 
 urlpatterns = [
     path('', include(router.urls)), 
@@ -24,5 +25,7 @@ urlpatterns = [
     path('orders/<int:pk>/update-status/', OrderViewSet.as_view({'patch': 'update_status'}), name='update-status'),
     path('buyer-dashboard/', BuyerDashboard.as_view(), name='buyer_dashboard'),
     path('seller-dashboard/', SellerDashboard.as_view(), name='seller_dashboard'),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
     
 ]

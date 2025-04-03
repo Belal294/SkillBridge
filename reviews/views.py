@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Review
@@ -11,6 +12,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def perform_create(self, serializer):
         order_id = self.request.data.get('order') 
@@ -26,7 +32,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
         else:
             return Response({"error": "You can only review after completing the order."}, status=status.HTTP_400_BAD_REQUEST)
     def get_queryset(self):
-        return Review.objects.filter(service__seller=self.request.user)  
+        if not self.request.user or self.request.user.is_anonymous:
+            return Review.objects.none() 
+
+        return Review.objects.filter(service__seller=self.request.user)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def my_reviews(self, request):

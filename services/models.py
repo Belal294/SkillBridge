@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from cloudinary.models import CloudinaryField
+from .validators import validate_file_size
 
 User = get_user_model()
 
@@ -20,3 +22,11 @@ class Service(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class ServiceImage(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='images')
+    image = CloudinaryField('image')
+    
+    def __str__(self):
+        return f"Image for {self.service.title}"
