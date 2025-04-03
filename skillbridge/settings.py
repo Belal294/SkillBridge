@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
 
+    'whitenoise.runserver_nostatic', 
+
     'users',
     'api',
     'services',
@@ -156,3 +158,5 @@ DJOSER = {
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+WSGI_APPLICATION = 'skillbridge.wsgi.app'
