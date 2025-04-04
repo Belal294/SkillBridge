@@ -23,7 +23,7 @@ class ServiceImageSerializer(serializers.ModelSerializer):
 
 
 class ServiceSerializer(serializers.ModelSerializer):
-    images = ServiceImageSerializer(many=True, read_only=True, source='serviceimage_set')
+    images = ServiceImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Service
