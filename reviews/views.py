@@ -1,43 +1,50 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound, PermissionDenied
+
 from .models import Review
 from .serializers import ReviewSerializer
 from orders.models import Order
-from rest_framework import status
-from rest_framework.exceptions import NotFound
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [AllowAny()]
         return [IsAuthenticated()]
 
-    def perform_create(self, serializer):
-        order_id = self.request.data.get('order') 
-        print(f"Order ID: {order_id}")
-        
-        try:
-            order = Order.objects.get(id=order_id)
-        except Order.DoesNotExist:
-            raise NotFound({"error": "Order not found."})  
-        
-        if order.buyer == self.request.user and order.status == 'completed':  
-            serializer.save(buyer=self.request.user, service=order.service, order=order)
-        else:
-            return Response({"error": "You can only review after completing the order."}, status=status.HTTP_400_BAD_REQUEST)
     def get_queryset(self):
-        if not self.request.user or self.request.user.is_anonymous:
-            return Review.objects.none() 
+        user = self.request.user
+        if user.is_authenticated and not user.is_staff:
+            return Review.objects.filter(service__seller=user)
+        elif user.is_staff:
+            return Review.objects.all()
+        return Review.objects.none()
 
-        return Review.objects.filter(service__seller=self.request.user)
+    def perform_create(self, serializer):
+        order_id = self.request.data.get('order')
+        order = Order.objects.filter(id=order_id).first()
 
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+        if not order:
+            raise NotFound({"error": "Order not found."})
+
+        if order.buyer != self.request.user:
+            raise PermissionDenied({"error": "You are not authorized to review this order."})
+
+        if order.status != 'completed':
+            raise PermissionDenied({"error": "You can only review a completed order."})
+
+        # Prevent multiple reviews for same order
+        if Review.objects.filter(order=order, buyer=self.request.user).exists():
+            raise PermissionDenied({"error": "You have already reviewed this order."})
+
+        serializer.save(buyer=self.request.user, service=order.service, order=order)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def my_reviews(self, request):
         reviews = Review.objects.filter(buyer=request.user)
         serializer = self.get_serializer(reviews, many=True)

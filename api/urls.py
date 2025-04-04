@@ -10,12 +10,12 @@ from reviews.views import ReviewViewSet
 
 # 🔹 Parent Router
 router = DefaultRouter()
-router.register('users', UserViewSet)
+router.register('users', UserViewSet, basename='users')
 router.register('services', ServiceViewSet, basename='services')
 router.register('categories', CategoryViewSet, basename='category')
-router.register('orders', OrderViewSet)
-router.register('notifications', NotificationViewSet)
-router.register('reviews', ReviewViewSet)
+router.register('orders', OrderViewSet, basename='order')
+router.register('notifications', NotificationViewSet, basename='notification')
+router.register('reviews', ReviewViewSet, basename='review')
 
 # 🔹 Nested Router for Service Images
 services_router = NestedDefaultRouter(router, 'services', lookup='service')

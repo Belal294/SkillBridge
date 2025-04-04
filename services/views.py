@@ -9,7 +9,7 @@ from .permissions import IsAdminOrReadOnly
 from django.shortcuts import get_object_or_404
 
 class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = Service.objects.all()
+    queryset = Service.objects.select_related('category', 'seller').prefetch_related('images').all()
     serializer_class = ServiceSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
@@ -25,7 +25,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAdminOrReadOnly] 
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class ServiceImageViewSet(ModelViewSet):
@@ -33,8 +33,8 @@ class ServiceImageViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        return ServiceImage.objects.filter(service_id=self.kwargs.get('service_pk'))  
+        return ServiceImage.objects.select_related('service').filter(service_id=self.kwargs.get('service_pk'))
 
     def perform_create(self, serializer):
-        service = get_object_or_404(Service, id=self.kwargs.get('service_pk'))  
+        service = get_object_or_404(Service, id=self.kwargs.get('service_pk'))
         serializer.save(service=service)

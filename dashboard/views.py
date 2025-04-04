@@ -8,6 +8,9 @@ class AdminDashboardView(APIView):
     permission_classes = [IsAdminUser]
 
     def get(self, request):
-        orders = Order.objects.all()
+        orders = Order.objects.select_related('buyer', 'service__seller', 'service__category')  # optimization
         serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data)
+        return Response({
+            "total_orders": orders.count(),
+            "orders": serializer.data
+        })
