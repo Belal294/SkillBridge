@@ -1,17 +1,17 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from .models import CustomUser
-from djoser.serializers import UserCreateSerializer as BaseUserSerializer, UserSerializer as BaseUserSerializer
+from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer, UserSerializer as BaseUserSerializer
 
 User = get_user_model()
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
 
     class Meta:
-        model = CustomUser
-        fields = ['id','first_name', 'last_name', 'email', 'role', 'password']
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email', 'role', 'password']
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -21,19 +21,22 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return user
 
 
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
 
-class UserCreateSerializer(BaseUserSerializer):
-    class Meta(BaseUserSerializer.Meta):
-        fields = ['id','username', 'email', 'password', 'first_name', 'last_name', 'role']
+
+class UserCreateSerializer(BaseUserCreateSerializer):
+    class Meta(BaseUserCreateSerializer.Meta):
+        model = User
+        fields = ['id', 'username', 'email',  'password', 'first_name', 'last_name', 'role']
 
 
 
 class UserSerializer(BaseUserSerializer):
-
     class Meta(BaseUserSerializer.Meta):
-        ref_name = 'Custom'
-        fields = ['id','username', 'email', 'first_name', 'last_name', 'role']
+        model = User
+        ref_name = 'CustomUser'  
+        fields = ['id', 'username', 'email',  'first_name', 'last_name', 'role']
