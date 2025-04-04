@@ -19,7 +19,7 @@ User = get_user_model()
 
 # Manage all users
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.select_related('profile').only('id', 'email', 'first_name', 'last_name', 'is_active')
     serializer_class = CustomUserSerializer
     permission_classes = [IsAdminUser]
 
@@ -39,9 +39,13 @@ class LoginView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
         password = request.data.get('password')
-        user = User.objects.filter(email=email).first()
 
-        if user and user.check_password(password):
+        try:
+            user = User.objects.get(email=email)  
+        except User.DoesNotExist:
+            return Response({"error": "Invalid Credentials"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if user.check_password(password):
             refresh = RefreshToken.for_user(user)
             return Response({
                 "refresh": str(refresh),
