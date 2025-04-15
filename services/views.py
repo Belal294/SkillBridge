@@ -7,6 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.viewsets import ModelViewSet
 from .permissions import IsAdminOrReadOnly
 from django.shortcuts import get_object_or_404
+from django.db.models import Count
 
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.select_related('category', 'seller').prefetch_related('images').all()
@@ -23,7 +24,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.annotate(service_count = Count('service')).all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
 

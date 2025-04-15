@@ -2,9 +2,11 @@ from rest_framework import serializers
 from .models import Service, Category, ServiceImage
 
 class CategorySerializer(serializers.ModelSerializer):
+    service_count = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['id', 'name', 'service_count']
 
 class ServiceImageSerializer(serializers.ModelSerializer):
     image = serializers.ImageField()
