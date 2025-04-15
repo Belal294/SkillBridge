@@ -1,5 +1,5 @@
 from rest_framework import viewsets, filters
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Service, Category, ServiceImage
 from .serializers import ServiceSerializer, CategorySerializer, ServiceImageSerializer
@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.select_related('category', 'seller').prefetch_related('images').all()
     serializer_class = ServiceSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     filterset_fields = ['category']
     ordering_fields = ['price']
@@ -30,7 +30,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 class ServiceImageViewSet(ModelViewSet):
     serializer_class = ServiceImageSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         return ServiceImage.objects.select_related('service').filter(service_id=self.kwargs.get('service_pk'))
