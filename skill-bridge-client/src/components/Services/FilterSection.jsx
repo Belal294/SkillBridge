@@ -1,6 +1,6 @@
 const FilterSection = ({
-    priceRange,
-    handlePriceChange,
+    // priceRange,
+    // handlePriceChange,
     categories,
     selectedCategory,
     handleCategoryChange,
@@ -10,14 +10,14 @@ const FilterSection = ({
     handleSorting,
   }) => {
     return (
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Price Range */}
+      <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Price Range
         <div className="bg-white p-4 rounded-lg shadow">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Price Range
           </label>
           {/* Min Range  */}
-          <div className="flex items-center space-x-4">
+          {/* <div className="flex items-center space-x-4">
             <input
               type="number"
               min="0"
@@ -35,9 +35,9 @@ const FilterSection = ({
               onChange={(e) => handlePriceChange(0, Number(e.target.value))}
               className="w-full"
             />
-          </div>
+          </div> */}
           {/* Max Range  */}
-          <div className="flex items-center space-x-4">
+          {/* <div className="flex items-center space-x-4">
             <input
               type="number"
               min={priceRange[0]}
@@ -55,19 +55,31 @@ const FilterSection = ({
               onChange={(e) => handlePriceChange(1, Number(e.target.value))}
               className="w-full"
             />
-          </div>
+          </div> */}
   
-          <div className="flex justify-between text-sm text-gray-600 mt-2">
+          {/* <div className="flex justify-between text-sm text-gray-600 mt-2">
             <span>${priceRange[0]}</span>
             <span>${priceRange[1]}</span>
           </div>
-        </div>
+        </div> */}
   
         {/* Category Filter */}
         <div className="bg-white p-4 rounded-lg shadow">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Category
           </label>
+          {/* <select
+            className="w-full p-2 border rounded-md"
+            value={selectedCategory}
+            onChange={(e) => handleCategoryChange(e.target.value)}
+          >
+            <option value="">All Categories</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select> */}
           <select
             className="w-full p-2 border rounded-md"
             value={selectedCategory}
@@ -80,7 +92,24 @@ const FilterSection = ({
               </option>
             ))}
           </select>
+
         </div>
+
+
+{/* <div className="bg-white p-4 rounded-lg shadow"></div>
+<select
+  className="w-full p-2 border rounded-md"
+  value={selectedCategory}
+  onChange={(e) => handleCategoryChange(e.target.value)}
+>
+  <option value="">All Categories</option>
+  {categories.map((category) => (
+    <option key={category.id} value={category.id}>
+      {category.name}
+    </option>
+  ))}
+</select>
+<div/> */}
   
         {/* Search */}
         <div className="bg-white p-4 rounded-lg shadow">
@@ -91,7 +120,7 @@ const FilterSection = ({
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearchQuery(e.target.value)}
-            placeholder="Search books..."
+            placeholder="Search ..."
             className="w-full p-2 border rounded-md"
           />
         </div>
